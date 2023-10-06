@@ -17,26 +17,9 @@ contract Poker is EIP712WithModifier {
     euint8 count;
     uint8 countPlain;
 
-
     euint8[] public deck;
     mapping(address => euint8[]) players;
     address[] playersArray;
-
-    // function test() public {
-    //     euint8 card = TFHE.randEuint8();
-    //     if (countPlain == 0) {
-    //         deck[count] = card;
-    //         count = TFHE.add(count, TFHE.asEuint8(1));
-    //         countPlain += 1;
-    //     } 
-    //     euint8 total;
-    //     for (uint8 i = 0; i < countPlain; i++) {
-    //         ebool duplicate = TFHE.eq(deck[i], card);
-    //         total = TFHE.add(total, TFHE.cmux(duplicate, TFHE.asEuint8(1), TFHE.asEuint8(0)));
-    //     }
-    //     count = TFHE.add(count, TFHE.asEuint8(1)); // add one
-    // }
-
 
     function checkDuplication(euint8 _card) internal view returns (euint8) {
         euint8 total;
@@ -48,7 +31,7 @@ contract Poker is EIP712WithModifier {
     }
 
     function dealCard() public {
-        euint8 card = TFHE.randEuint8();
+        euint8 card = TFHE.randEuint8(); // mod 52
         if (deck.length == 0) {
             deck.push(card);
         } else if (TFHE.decrypt(checkDuplication(card)) == 0) {
@@ -81,7 +64,6 @@ contract Poker is EIP712WithModifier {
     function checkSecondCard(bytes32 publicKey, bytes calldata signature) public view onlySignedPublicKey(publicKey, signature) returns (bytes memory) {
         return  TFHE.reencrypt(players[msg.sender][1], publicKey, 0);
     }
-
 
 
 }

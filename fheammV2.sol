@@ -34,8 +34,8 @@ contract CPAMM {
         reserve1 = _reserve1;
     }
 
-    function swap(address _tokenIn, euint32 _amountIn) external returns (uint amountOut) {
-        uint32 _amountIn = TFHE.decrypt(_amountIn);
+    function swap(address _tokenIn, bytes memory _amountIn) external returns (uint amountOut) {
+        uint32 _amountIn = TFHE.decrypt(TFHE.asEuint32(_amountIn));
         require(
             _tokenIn == address(token0) || _tokenIn == address(token1),
             "invalid token"
@@ -69,9 +69,9 @@ contract CPAMM {
         _update(token0.balanceOf(address(this)), token1.balanceOf(address(this)));
     }
 
-    function addLiquidity(euint32 _amount0, euint32 _amount1) external returns (uint shares) {
-        uint32 _amount0 = TFHE.decrypt(_amount0);
-        uint32 _amount1 = TFHE.decrypt(_amount1);
+    function addLiquidity(bytes calldata _amount0, bytes calldata _amount1) external returns (uint shares) {
+        uint32 _amount0 = TFHE.decrypt(TFHE.asEuint32(_amount0));
+        uint32 _amount1 = TFHE.decrypt(TFHE.asEuint32(_amount1));
         
         token0.transferFrom(msg.sender, address(this), _amount0);
         token1.transferFrom(msg.sender, address(this), _amount1);
@@ -160,7 +160,7 @@ contract CPAMM {
     }
 
     function removeLiquidity(
-        euint32 _shares
+        bytes memory _shares
     ) external returns (uint amount0, uint amount1) {
         /*
         Claim
@@ -198,7 +198,7 @@ contract CPAMM {
 
         // bal0 >= reserve0
         // bal1 >= reserve1
-        uint32 _shares = TFHE.decrypt(_shares);
+        uint32 _shares = TFHE.decrypt(TFHE.asEuint32(_shares));
         uint bal0 = token0.balanceOf(address(this));
         uint bal1 = token1.balanceOf(address(this));
 
